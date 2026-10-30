@@ -1,0 +1,470 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+    scroll-snap-type: y mandatory;
+  }
+
+  html, body, #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-void text-ivory font-editorial antialiased;
+    background: linear-gradient(180deg, #181b21 0%, #11151b 100%);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  p {
+    @apply text-base leading-relaxed;
+  }
+
+  ::selection {
+    @apply bg-crimson/40 text-white;
+  }
+}
+
+@layer components {
+  .container {
+    @apply mx-auto px-4 max-w-6xl;
+  }
+}
+
+/* ── Global film grain (body-wide) ── */
+.global-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  mix-blend-mode: overlay;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .global-grain {
+    animation: grainShift 0.4s steps(6) infinite;
+  }
+}
+
+/* ── Ambient radial glow spots ── */
+.ambient-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+}
+
+.ambient-glow--crimson {
+  background: radial-gradient(circle, rgba(220, 38, 38, 0.18) 0%, transparent 70%);
+}
+
+.ambient-glow--neutral {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+}
+
+/* ── TV distortion overlays ── */
+.tv-glitch {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.tv-glitch--red {
+  background: rgba(255, 0, 0, 0.055);
+  animation: tvGlitchRed 5s infinite linear;
+}
+
+.tv-glitch--cyan {
+  background: rgba(0, 255, 255, 0.04);
+  animation: tvGlitchCyan 5s infinite linear;
+  animation-delay: -2.5s;
+}
+
+@keyframes tvGlitchRed {
+  0%   { opacity: 0; transform: translateX(0);    clip-path: inset(0 0 100% 0); }
+  8%   { opacity: 1; transform: translateX(-3px); clip-path: inset(15% 0 60% 0); }
+  9%   { opacity: 1; transform: translateX(3px);  clip-path: inset(30% 0 40% 0); }
+  10%  { opacity: 0; transform: translateX(0);    clip-path: inset(0 0 100% 0); }
+  42%  { opacity: 0; transform: translateX(0);    clip-path: inset(0 0 100% 0); }
+  43%  { opacity: 1; transform: translateX(-5px); clip-path: inset(5%  0 75% 0); }
+  44%  { opacity: 1; transform: translateX(2px);  clip-path: inset(50% 0 20% 0); }
+  45%  { opacity: 0; transform: translateX(0);    clip-path: inset(0 0 100% 0); }
+  78%  { opacity: 0; transform: translateX(0);    clip-path: inset(0 0 100% 0); }
+  79%  { opacity: 1; transform: translateX(-2px); clip-path: inset(70% 0 5%  0); }
+  80%  { opacity: 0; transform: translateX(0);    clip-path: inset(0 0 100% 0); }
+  100% { opacity: 0; }
+}
+
+@keyframes tvGlitchCyan {
+  0%   { opacity: 0; transform: translateX(0);   clip-path: inset(0 0 100% 0); }
+  15%  { opacity: 0; transform: translateX(0);   clip-path: inset(0 0 100% 0); }
+  16%  { opacity: 1; transform: translateX(4px); clip-path: inset(40% 0 35% 0); }
+  17%  { opacity: 1; transform: translateX(-3px);clip-path: inset(20% 0 55% 0); }
+  18%  { opacity: 0; transform: translateX(0);   clip-path: inset(0 0 100% 0); }
+  60%  { opacity: 0; transform: translateX(0);   clip-path: inset(0 0 100% 0); }
+  61%  { opacity: 1; transform: translateX(6px); clip-path: inset(60% 0 10% 0); }
+  62%  { opacity: 0; transform: translateX(0);   clip-path: inset(0 0 100% 0); }
+  100% { opacity: 0; }
+}
+
+/* ── CRT scanlines + vignette ── */
+.crt { position: relative; overflow: hidden; }
+
+.crt::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(0,0,0,0.04) 50%, rgba(255,255,255,0.02) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  z-index: 5;
+  animation: crt-scan 6s linear infinite;
+}
+
+.crt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0) 35%, rgba(0,0,0,0.55) 100%);
+}
+
+@keyframes crt-scan {
+  0% { transform: translateY(0); opacity: 0.9; }
+  50% { transform: translateY(2px); opacity: 0.95; }
+  100% { transform: translateY(0); opacity: 0.9; }
+}
+
+/* ── Paper stack layers (hero scroll storytelling) ── */
+.paper-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(9, 9, 11, 0.9) 100%);
+  transform-origin: center top;
+  will-change: transform, opacity;
+}
+
+.paper-layer--1 { z-index: 1; }
+.paper-layer--2 { z-index: 2; background: linear-gradient(135deg, rgba(20, 20, 25, 0.5) 0%, rgba(9, 9, 11, 0.85) 100%); }
+.paper-layer--3 { z-index: 3; background: linear-gradient(135deg, rgba(25, 25, 30, 0.4) 0%, rgba(9, 9, 11, 0.8) 100%); }
+
+.paper-backdrop { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+
+/* ── Garuda background layer ── */
+.garuda-bg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.garuda-bg img {
+  width: auto;
+  max-width: min(50vw, 400px);
+  max-height: 45vh;
+  object-fit: contain;
+  opacity: 0.75;
+  mix-blend-mode: luminosity;
+  filter: grayscale(1) contrast(1.2);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.section-grid {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  margin-bottom: -100vh;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 75%);
+  z-index: 0;
+}
+
+.watermark-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  margin-bottom: -100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.watermark-sticky::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(52vw, 460px);
+  height: min(52vw, 460px);
+  background-image: url('/kastrat.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.15;
+  filter: grayscale(1) brightness(1.08) contrast(1.15);
+}
+
+main {
+  position: relative;
+  z-index: 0;
+}
+
+@keyframes grainShift {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-3%, -2%); }
+  50% { transform: translate(2%, 3%); }
+  75% { transform: translate(-2%, 2%); }
+}
+
+/* ── Slice glitch text ── */
+.glitch-slice { position: relative; display: inline-block; }
+.glitch-slice .slice {
+  display: block;
+  transform-origin: left center;
+  animation: sliceGlitch 4s infinite linear;
+}
+
+@keyframes sliceGlitch {
+  0% { transform: translateX(0) skewX(0deg); clip-path: inset(0 0 0 0); }
+  10% { transform: translateX(-8px) skewX(-6deg); clip-path: inset(10% 0 70% 0); }
+  20% { transform: translateX(6px) skewX(4deg); clip-path: inset(40% 0 30% 0); }
+  30% { transform: translateX(-2px) skewX(-2deg); clip-path: inset(20% 0 60% 0); }
+  100% { transform: translateX(0) skewX(0deg); clip-path: inset(0 0 0 0); }
+}
+
+/* ── Archive / Propaganda cards ── */
+.archive-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border-radius: 3px;
+  background-color: rgba(5, 5, 5, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background-image: var(--cursor-gradient, none), linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+  background-blend-mode: overlay, normal;
+  backdrop-filter: blur(12px);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s, box-shadow 0.3s;
+  overflow: hidden;
+}
+
+.archive-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.archive-card:hover {
+  transform: scale(1.04);
+  border-color: rgba(220, 38, 38, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(220, 38, 38, 0.25),
+    0 12px 48px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.archive-card:active {
+  transform: scale(1.01);
+}
+
+/* Legacy study-card alias */
+.study-card {
+  @apply archive-card;
+}
+
+/* ── Redaksi badge ── */
+.badge-redaksi {
+  @apply inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-[0.2em] px-2.5 py-1 border border-crimson/40 text-crimson-glow bg-crimson/10 rounded-sm;
+}
+
+.badge-classified {
+  @apply inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-[0.2em] px-2.5 py-1 border border-amber-500/40 text-amber-300 bg-amber-500/10 rounded-sm;
+}
+
+/* ── Status indicator ping ── */
+.status-dot {
+  @apply relative inline-flex h-2 w-2 rounded-full;
+}
+
+.status-dot--live {
+  @apply bg-emerald-500;
+}
+
+.status-dot--live::after {
+  content: '';
+  @apply absolute inline-flex h-full w-full rounded-full bg-emerald-400 animate-pulse-ping;
+}
+
+.status-dot--error {
+  @apply bg-crimson;
+}
+
+.status-dot--error::after {
+  content: '';
+  @apply absolute inline-flex h-full w-full rounded-full bg-crimson-glow animate-pulse-ping;
+}
+
+.status-dot--classified {
+  @apply bg-amber-500;
+}
+
+.status-dot--classified::after {
+  content: '';
+  @apply absolute inline-flex h-full w-full rounded-full bg-amber-400 animate-pulse-ping;
+}
+
+
+
+/* ── Hero noise overlay ── */
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+}
+
+/* ── Horizontal moving scan line ── */
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 60%, transparent 100%);
+  pointer-events: none;
+  z-index: 6;
+  animation: scanMove 7s linear infinite;
+}
+
+@keyframes scanMove {
+  0%   { top: -2px; opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* ── Scroll arrow bounce ── */
+.scroll-arrow {
+  width: 10px;
+  height: 10px;
+  border-right: 1.5px solid rgba(255,255,255,0.25);
+  border-bottom: 1.5px solid rgba(255,255,255,0.25);
+  transform: rotate(45deg);
+  animation: arrowBounce 1.8s ease-in-out infinite;
+}
+
+@keyframes arrowBounce {
+  0%, 100% { transform: rotate(45deg) translateY(0); opacity: 0.4; }
+  50%       { transform: rotate(45deg) translateY(4px); opacity: 0.9; }
+}
+
+/* ── Corner bracket decorations ── */
+.corner-mark {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-top: 1.5px solid rgba(220, 38, 38, 0.25);
+  border-left: 1.5px solid rgba(220, 38, 38, 0.25);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Glass header ── */
+.header-glass {
+  background: rgba(9, 9, 11, 0.72);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Propaganda newspaper strip ── */
+.propaganda-strip {
+  position: relative;
+  border-left: 4px solid rgba(220, 38, 38, 0.7);
+  padding-left: 1.5rem !important;
+  margin-left: -1.5rem;
+}
+
+.propaganda-strip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(220, 38, 38, 0.12) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+
+
+/* ── Reduced motion overrides ── */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(220, 38, 38, 0.3);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(220, 38, 38, 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .global-grain {
+    animation: none;
+  }
+
+  .archive-card:hover {
+    transform: none;
+  }
+
+  .crt::before,
+  .scan-line,
+  .tv-glitch {
+    animation: none !important;
+  }
+}
+
+.crt > * { position: relative; z-index: 1; }
